@@ -5,30 +5,23 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  ServiceUnavailableException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   CertificateAccessPolicyStatus,
   CertificateRequestStatus,
-  IdentityType,
   PersonalKeyAlgorithm,
   type PersonalCertificateRequest,
 } from '@mucyora/db';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { KeysService } from '../keys/keys.service';
-import { ForeignIdentityClient } from '../foreign-identity/foreign-identity.client';
-import type { ForeignIdentityProfile } from '../foreign-identity/foreign-identity-profile.interface';
 import { IssueCertificateDto } from './dto/issue-certificate.dto';
 import { RevokeCertificateDto } from './dto/revoke-certificate.dto';
 import { decryptIdentityValue } from './helpers/identity-crypto.helper';
 import { buildPersonalX509 } from './helpers/x509.helper';
 
 type StoredIdentityRecord = {
-  identityType: IdentityType;
   nidEncrypted: string | null;
-  finEncrypted: string | null;
   surName: string;
   postNames: string;
 };
@@ -69,7 +62,6 @@ export class CertificatesService {
     private readonly prisma: PrismaService,
     private readonly keys: KeysService,
     private readonly config: ConfigService,
-    private readonly foreignIdentityClient: ForeignIdentityClient,
   ) {}
 
   async issue(userId: string, dto: IssueCertificateDto) {
@@ -245,10 +237,11 @@ export class CertificatesService {
     await this.ensureNoActiveCertificate(request.userId);
     await this.ensureKeyPairHasNoCertificate(request.keyPairId);
     const citizenIdentity = await this.ensureVerifiedIdentity(request.userId);
-    const subjectIdentity = await this.resolveSubjectIdentity(citizenIdentity);
+    const subjectIdentity = this.resolveSubjectIdentity(citizenIdentity);
 
-    let privateKeyPem: string | null =
-      await this.keys.decryptActivePrivateKey(request.userId);
+    let privateKeyPem: string | null = await this.keys.decryptActivePrivateKey(
+      request.userId,
+    );
 
     const result = buildPersonalX509(
       {
@@ -459,9 +452,7 @@ export class CertificatesService {
     const citizenIdentity = await this.prisma.citizenIdentity.findUnique({
       where: { userId },
       select: {
-        identityType: true,
         nidEncrypted: true,
-        finEncrypted: true,
         surName: true,
         postNames: true,
       },
@@ -652,15 +643,13 @@ export class CertificatesService {
       isExpired,
       daysRemaining: isExpired
         ? 0
-        : Math.floor((certificate.notAfter.getTime() - now.getTime()) / 86_400_000),
+        : Math.floor(
+            (certificate.notAfter.getTime() - now.getTime()) / 86_400_000,
+          ),
     };
   }
 
-  private async resolveSubjectIdentity(citizenIdentity: StoredIdentityRecord) {
-    if (citizenIdentity.identityType === IdentityType.FIN) {
-      return this.resolveForeignIdentitySubject(citizenIdentity.finEncrypted);
-    }
-
+  private resolveSubjectIdentity(citizenIdentity: StoredIdentityRecord) {
     const nid = this.decryptStoredIdentity(
       citizenIdentity.nidEncrypted,
       'National ID',
@@ -669,30 +658,6 @@ export class CertificatesService {
     return {
       identifier: nid,
       subjectCountry: 'RW',
-    };
-  }
-
-  private async resolveForeignIdentitySubject(finEncrypted: string | null) {
-    const fin = this.decryptStoredIdentity(
-      finEncrypted,
-      'Foreign Identity Number',
-    );
-
-    try {
-      const profile = await this.foreignIdentityClient.getByFin(fin);
-      return this.buildForeignIdentitySubject(fin, profile);
-    } catch (error) {
-      this.handleForeignIdentityLookupError(error);
-    }
-  }
-
-  private buildForeignIdentitySubject(
-    fin: string,
-    profile: ForeignIdentityProfile,
-  ) {
-    return {
-      identifier: fin,
-      subjectCountry: profile.countryOfOrigin,
     };
   }
 
@@ -747,35 +712,12 @@ export class CertificatesService {
     return `Certificate access has been blocked by platform administrators. You cannot ${actionText} until this restriction is lifted.${suffix}`;
   }
 
-  private handleForeignIdentityLookupError(error: unknown): never {
-    if (error instanceof NotFoundException) {
-      throw new InternalServerErrorException(
-        'Certificate issuance failed: associated foreign identity record not found. Contact platform administrators.',
-      );
-    }
-
-    if (
-      error instanceof ServiceUnavailableException ||
-      error instanceof UnauthorizedException
-    ) {
-      throw new ServiceUnavailableException(
-        'Foreign identity service is currently unavailable. Please try again in a few minutes.',
-      );
-    }
-
-    throw new InternalServerErrorException(
-      'Certificate issuance failed due to an unexpected foreign identity lookup error.',
-    );
-  }
-
   private throwForMissingCurrentCertificate(
-    latestRequest:
-      | {
-          status: CertificateRequestStatus;
-          reviewReason: string | null;
-          cancellationReason: string | null;
-        }
-      | null,
+    latestRequest: {
+      status: CertificateRequestStatus;
+      reviewReason: string | null;
+      cancellationReason: string | null;
+    } | null,
   ): never {
     if (!latestRequest) {
       throw new NotFoundException(
