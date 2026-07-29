@@ -42,7 +42,7 @@ async function bootstrap() {
 
   if (env !== 'production') {
     const swaggerConfig = new DocumentBuilder()
-      .setTitle('Gracon 360 — Signature Service')
+      .setTitle('MUCYORA 360 — Signature Service')
       .setDescription('Personal digital signature and certificate API')
       .setVersion('1.0')
       .addBearerAuth()
