@@ -15,7 +15,7 @@ import {
   IdentityType,
   PersonalKeyAlgorithm,
   type PersonalCertificateRequest,
-} from '@gracon/database';
+} from '@mucyora/db';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { KeysService } from '../keys/keys.service';
 import { ForeignIdentityClient } from '../foreign-identity/foreign-identity.client';
