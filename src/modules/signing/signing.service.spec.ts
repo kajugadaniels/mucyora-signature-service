@@ -125,4 +125,35 @@ describe('SigningService', () => {
       ),
     );
   });
+
+  it('records a failed verification when the submitted user has no certificate', async () => {
+    const { service, prisma } = createService();
+    prisma.personalCertificate.findFirst.mockResolvedValue(null);
+    prisma.personalSignatureVerification.create.mockResolvedValue({
+      id: 'verification-1',
+    });
+
+    const dto = {
+      userId: '7d80b7a3-1caf-4e4a-90c1-da69fa157cf8',
+      documentHash: 'a'.repeat(64),
+      signatureBytes: 'c2lnbmF0dXJl',
+    };
+
+    await expect(service.verify(dto, '127.0.0.1')).resolves.toEqual({
+      valid: false,
+      reason: 'No active certificate found for this user.',
+    });
+
+    expect(prisma.personalSignatureVerification.create).toHaveBeenCalledWith({
+      data: {
+        certificateId: null,
+        submittedUserId: dto.userId,
+        documentHash: dto.documentHash,
+        signatureBytes: dto.signatureBytes,
+        result: false,
+        failReason: 'No active certificate found for this user.',
+        ipAddress: '127.0.0.1',
+      },
+    });
+  });
 });
