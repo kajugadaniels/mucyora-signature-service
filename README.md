@@ -71,7 +71,7 @@ The current project is a useful starting point, but MUCYORA must change these be
 
 1. Consume the shared database package as `@mucyora/db` from `file:../db`.
 2. Use `mucyora_signature_app` for runtime database access.
-3. Remove direct NID/FIN decryption and the former Foreign Identity dependency.
+3. Remove direct NID decryption from certificate issuance.
 4. Do not place raw identity numbers in X.509 certificate subjects.
 5. Replace self-signed user certificates with a documented MUCYORA trust profile.
 6. Replace AES-256-CBC private-key storage with authenticated encryption or KMS/HSM signing.
