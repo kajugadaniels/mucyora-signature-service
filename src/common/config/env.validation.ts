@@ -94,24 +94,6 @@ class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  FOREIGN_IDENTITY_SERVICE_URL: string;
-
-  @IsString()
-  @IsNotEmpty()
-  FOREIGN_IDENTITY_SERVICE_USERNAME: string;
-
-  @IsString()
-  @IsNotEmpty()
-  FOREIGN_IDENTITY_SERVICE_PASSWORD: string;
-
-  @IsOptional()
-  @Transform(({ value }) => parseNumberValue(value, 300000))
-  @IsNumber()
-  @Min(1000)
-  FOREIGN_IDENTITY_CACHE_TTL_MS: number = 300000;
-
-  @IsString()
-  @IsNotEmpty()
   SIGNATURE_SERVICE_USERNAME: string;
 
   @IsString()
