@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { createPrismaClientOptions, PrismaClient } from '@gracon/database';
+import { createPrismaClientOptions, PrismaClient } from '@mucyora/db';
 
 @Injectable()
 export class PrismaService
