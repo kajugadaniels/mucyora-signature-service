@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { Prisma } from '@gracon/database';
+import { Prisma } from '@mucyora/db';
 import { Response } from 'express';
 
 @Catch()
