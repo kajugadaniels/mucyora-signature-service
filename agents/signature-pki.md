@@ -10,7 +10,6 @@
 
 - Certificate request, certificate issuance, revocation, and access sanctions are separate lifecycle states.
 - Admin approval is required before a certificate becomes usable.
-- FIN-backed certificates must use foreign identity country data where required.
 
 ## Signing
 
