@@ -19,10 +19,10 @@ jobs:
     steps:
       - name: Require database repository variable
         env:
-          DATABASE_REPOSITORY: ${{ vars.GRACON_DATABASE_REPOSITORY }}
+          DATABASE_REPOSITORY: ${{ vars.MUCYORA_DATABASE_REPOSITORY }}
         run: |
           if [ -z "$DATABASE_REPOSITORY" ]; then
-            echo "Set the GRACON_DATABASE_REPOSITORY repository variable to the api/database GitHub repository, for example owner/database."
+            echo "Set the MUCYORA_DATABASE_REPOSITORY repository variable to the api/database GitHub repository, for example owner/database."
             exit 1
           fi
 
@@ -34,8 +34,8 @@ jobs:
       - name: Checkout database repo
         uses: actions/checkout@v4
         with:
-          repository: ${{ vars.GRACON_DATABASE_REPOSITORY }}
-          token: ${{ secrets.GRACON_DATABASE_REPOSITORY_TOKEN || github.token }}
+          repository: ${{ vars.MUCYORA_DATABASE_REPOSITORY }}
+          token: ${{ secrets.MUCYORA_DATABASE_REPOSITORY_TOKEN || github.token }}
           path: api/database
 
       - name: Setup Node
