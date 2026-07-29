@@ -7,7 +7,6 @@ Add tests when changing:
 - certificate access policy enforcement
 - signing proof behavior
 - signature-image upload validation
-- foreign identity certificate subject mapping
 
 Validation commands:
 
