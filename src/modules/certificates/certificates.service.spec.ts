@@ -14,7 +14,7 @@ import {
   IdentityType,
   PersonalKeyAlgorithm,
   type PersonalCertificateRequest,
-} from '@gracon/database';
+} from '@mucyora/db';
 import { CertificatesService } from './certificates.service';
 import { ForeignIdentityClient } from '../foreign-identity/foreign-identity.client';
 import { KeysService } from '../keys/keys.service';
