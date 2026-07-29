@@ -7,7 +7,7 @@ import {
 import {
   CertificateAccessPolicyStatus,
   CertificateRequestStatus,
-} from '@gracon/database';
+} from '@mucyora/db';
 import * as crypto from 'crypto';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { KeysService } from '../keys/keys.service';
