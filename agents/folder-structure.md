@@ -6,7 +6,6 @@
 - `certificates/` owns certificate requests, status, and admin-approved issuance.
 - `signature-image/` owns decorative signature-image assets.
 - `signing/` owns cryptographic signing and proof persistence.
-- `foreign-identity/` owns FIN profile lookup for certificate issuance.
 
 ## Placement Rules
 
