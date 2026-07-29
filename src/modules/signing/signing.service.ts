@@ -131,8 +131,10 @@ export class SigningService {
     // Log every verification — including failed ones
     await this.prisma.personalSignatureVerification.create({
       data: {
-        certificateId: certificate?.id ?? 'unknown',
+        certificateId: certificate?.id ?? null,
+        submittedUserId: dto.userId,
         documentHash: dto.documentHash,
+        signatureBytes: dto.signatureBytes,
         result,
         failReason,
         ipAddress,
