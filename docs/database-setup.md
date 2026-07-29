@@ -12,7 +12,7 @@ migrations. Run schema migrations and Prisma generation from `api/database`.
 Use this Neon runtime role:
 
 ```text
-gracon_signature_app
+mucyora_signature_app
 ```
 
 This role should connect to the same Neon database as the other APIs, but it
@@ -35,13 +35,13 @@ npm run migrate:deploy
 In the Neon SQL Editor, create or reset the role password:
 
 ```sql
-CREATE ROLE gracon_signature_app LOGIN PASSWORD 'replace_with_signature_password';
+CREATE ROLE mucyora_signature_app LOGIN PASSWORD 'replace_with_signature_password';
 ```
 
 If it already exists:
 
 ```sql
-ALTER ROLE gracon_signature_app WITH PASSWORD 'replace_with_signature_password';
+ALTER ROLE mucyora_signature_app WITH PASSWORD 'replace_with_signature_password';
 ```
 
 Grant runtime permissions using `api/database/docs/runtime-database-roles.md`.
@@ -51,7 +51,7 @@ Grant runtime permissions using `api/database/docs/runtime-database-roles.md`.
 Use the Neon pooled hostname with `-pooler`:
 
 ```env
-DATABASE_URL=postgresql://gracon_signature_app:password@ep-example-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=postgresql://mucyora_signature_app:password@ep-example-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
 ```
 
 If the password has symbols, URL-encode it:
