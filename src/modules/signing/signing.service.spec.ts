@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import {
   CertificateAccessPolicyStatus,
   CertificateRequestStatus,
-} from '@gracon/database';
+} from '@mucyora/db';
 import { SigningService } from './signing.service';
 
 describe('SigningService', () => {
