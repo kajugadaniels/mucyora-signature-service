@@ -4,63 +4,49 @@ Use this guide when setting up `api/signature` after cloning the project.
 
 ## Ownership
 
-`api/signature` uses the shared database at runtime, but it does not own
-migrations. Run schema migrations and Prisma generation from `api/database`.
+`api/signature` uses the shared MySQL database at runtime, but it does not own
+the schema or migrations. Generate the shared Prisma client and apply all
+schema migrations from `api/db` only.
 
-## Required Role
+## Local XAMPP Connection
 
-Use this Neon runtime role:
+Start MySQL in XAMPP and create the local database if it does not exist:
 
-```text
-mucyora_signature_app
+```bash
+/Applications/XAMPP/xamppfiles/bin/mysql -u root -e "CREATE DATABASE IF NOT EXISTS mucyora CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 ```
 
-This role should connect to the same Neon database as the other APIs, but it
-must not be the owner or migration role.
+Local development uses the XAMPP `root` account without a password:
 
-## 1. Prepare The Database Package
+```env
+DATABASE_URL=mysql://root@127.0.0.1:3306/mucyora
+```
 
-From `api/database`, install dependencies, generate the shared Prisma client,
-build it, and apply migrations:
+Passwordless root access is permitted only on loopback for local development.
+Production must use a dedicated `mucyora_signature_app` account with a strong
+password, encrypted transport, and only the table privileges documented in
+`api/db/docs/runtime-database-roles.md`.
+
+## Prepare The Shared Database Package
+
+From `api/db`, install dependencies, generate the Prisma client, validate the
+package, and apply the committed migrations:
 
 ```bash
 npm install
 npm run prisma:generate
-npm run build
+npm run check
 npm run migrate:deploy
+npm run migrate:status
+npm run build
 ```
 
-## 2. Create Or Reset The Neon Role
+Migration credentials belong only in `api/db`. Never add
+`DATABASE_MIGRATION_URL` to the Signature service.
 
-In the Neon SQL Editor, create or reset the role password:
+## Install And Start Signature
 
-```sql
-CREATE ROLE mucyora_signature_app LOGIN PASSWORD 'replace_with_signature_password';
-```
-
-If it already exists:
-
-```sql
-ALTER ROLE mucyora_signature_app WITH PASSWORD 'replace_with_signature_password';
-```
-
-Grant runtime permissions using `api/database/docs/runtime-database-roles.md`.
-
-## 3. Configure `DATABASE_URL`
-
-Use the Neon pooled hostname with `-pooler`:
-
-```env
-DATABASE_URL=postgresql://mucyora_signature_app:password@ep-example-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
-```
-
-If the password has symbols, URL-encode it:
-
-```bash
-node -e "console.log(encodeURIComponent(process.argv[1]))" 'your_password'
-```
-
-## 4. Install And Start
+From `api/signature`:
 
 ```bash
 npm install
@@ -68,5 +54,6 @@ npm run build
 npm run start:dev
 ```
 
-If startup fails with `P1000`, the role name, branch, or password is wrong. If
-it fails with `permission denied`, the role exists but grants are missing.
+If startup cannot connect, confirm XAMPP MySQL is listening on
+`127.0.0.1:3306`, the `mucyora` database exists, and `DATABASE_URL` uses the
+`mysql://` protocol.
