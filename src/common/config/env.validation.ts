@@ -117,5 +117,16 @@ export function validateEnv(config: Record<string, unknown>) {
     );
   }
 
+  try {
+    const databaseUrl = new URL(validated.DATABASE_URL);
+    if (databaseUrl.protocol !== 'mysql:') {
+      throw new Error('invalid protocol');
+    }
+  } catch {
+    throw new Error(
+      '[Signature Service] Environment validation failed:\nDATABASE_URL must be a valid mysql:// URL',
+    );
+  }
+
   return validated;
 }
