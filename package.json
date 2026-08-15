@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@mucyora/db": "file:../db",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.0.1",
@@ -28,7 +29,6 @@
     "@nestjs/platform-express": "^11.1.18",
     "@nestjs/swagger": "^11.2.6",
     "@nestjs/throttler": "^6.5.0",
-    "@types/pg": "^8.20.0",
     "aws-sdk": "^2.1693.0",
     "axios": "^1.15.2",
     "class-transformer": "^0.5.1",
@@ -38,11 +38,9 @@
     "node-forge": "^1.4.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
-    "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "uuid": "^13.0.0",
-    "@mucyora/db": "file:../db"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
